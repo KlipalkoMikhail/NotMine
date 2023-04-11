@@ -1,4 +1,5 @@
 #include "polynomial.h"
+#include "my_exception.h"
 #include <iostream>
 #include <math.h>
 using namespace std;
@@ -9,7 +10,7 @@ Polynomial::Polynomial()
 {
     this->power = 0;
     this->polynomial = new double[1];
-    polynomial[0] = 0.;
+    polynomial[0] = 0;
 }
 
 Polynomial::Polynomial(double coefficient) 
@@ -21,140 +22,164 @@ Polynomial::Polynomial(double coefficient)
 
 Polynomial::Polynomial(size_t power, double coefficient) 
 {
-    this->power = power;
-    this->polynomial = new double[power + 1];
-    for (i = 0; i < power; i++)
-        polynomial[i] = 0;
-    polynomial[power] = coefficient;
+    try{
+        this->power = power;
+        this->polynomial = new double[power + 1];
+        for (i = 0; i < power; i++)
+            polynomial[i] = 0;
+        polynomial[power] = coefficient;
+    } catch(MyException &message){
+        throw new MyException(EC_MEMORY, "Bad memory allocation\n");
+    }
 }
 
 Polynomial::Polynomial(const Polynomial &other) 
 {
-    this->power = other.power;
-    this->polynomial = new double[this->power + 1];
-    for(i = 0; i <= this->power; i++)
-        this->polynomial[i] = other.polynomial[i];
+    try{
+        this->power = other.power;
+        this->polynomial = new double[this->power + 1];
+        for(i = 0; i <= this->power; i++)
+            this->polynomial[i] = other.polynomial[i];
+    } catch(MyException &message){
+        throw new MyException(EC_MEMORY, "Bad memory allocation\n");
+    }
 }
 
 //методы
 void Polynomial::operator=(const Polynomial &other)
 {
-    this->power = other.power;
-    delete this->polynomial;
-    this->polynomial = new double[this->power + 1];
-    for(i = 0; i <= this->power; i++)
+    try{
+        this->power = other.power;
+        delete this->polynomial;
+        this->polynomial = new double[this->power + 1];
+        for(i = 0; i <= this->power; i++)
         this->polynomial[i] = other.polynomial[i];
+    } catch(MyException &message){
+        throw new MyException(EC_MEMORY, "Bad memory allocation\n");
+    }
 }
 
 Polynomial Polynomial::operator+(const Polynomial &other)
 {
-    Polynomial temporary_polynomial;
-    Polynomial resulting_polynomial;
+    try{
+        Polynomial temporary_polynomial;
+        Polynomial resulting_polynomial;
 
-    temporary_polynomial.power = fmax(this->power, other.power);
-    temporary_variable = fmin(this->power, other.power);
-    temporary_polynomial.polynomial = new double[temporary_polynomial.power+1];
+        temporary_polynomial.power = fmax(this->power, other.power);
+        temporary_variable = fmin(this->power, other.power);
+        temporary_polynomial.polynomial = new double[temporary_polynomial.power+1];
 
-    for (i = 0; i <= temporary_variable; i++)
-        temporary_polynomial.polynomial[i] = this->polynomial[i] + other.polynomial[i];
+        for (i = 0; i <= temporary_variable; i++)
+            temporary_polynomial.polynomial[i] = this->polynomial[i] + other.polynomial[i];
 
-    if(this->power == temporary_polynomial.power)
-        for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
-            temporary_polynomial.polynomial[i] = this->polynomial[i];
-    else
-        for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
-            temporary_polynomial.polynomial[i] = other.polynomial[i];
+        if(this->power == temporary_polynomial.power)
+            for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
+                temporary_polynomial.polynomial[i] = this->polynomial[i];
+        else
+            for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
+                temporary_polynomial.polynomial[i] = other.polynomial[i];
 
-    if (fabs(temporary_polynomial.polynomial[temporary_polynomial.power]) < 1e-100)
-    {
-        i = temporary_polynomial.power;
-        while(fabs(temporary_polynomial.polynomial[i]) < 1e-100 && i != 0)
-            i--;
-        if (i != 0)
+        if (fabs(temporary_polynomial.polynomial[temporary_polynomial.power]) < 1e-100)
         {
-            resulting_polynomial.power = i;
-            resulting_polynomial.polynomial = new double[resulting_polynomial.power + 1];
-            for (i = 0; i <= resulting_polynomial.power; i++)
-                resulting_polynomial.polynomial[i] = temporary_polynomial.polynomial[i];
+            i = temporary_polynomial.power;
+            while(fabs(temporary_polynomial.polynomial[i]) < 1e-100 && i != 0)
+                i--;
+            if (i != 0)
+            {
+                resulting_polynomial.power = i;
+                resulting_polynomial.polynomial = new double[resulting_polynomial.power + 1];
+                for (i = 0; i <= resulting_polynomial.power; i++)
+                    resulting_polynomial.polynomial[i] = temporary_polynomial.polynomial[i];
+            }
+            return resulting_polynomial;
         }
-        return resulting_polynomial;
+        else
+            return temporary_polynomial;
+    } catch(MyException &message){
+        throw new MyException(EC_MEMORY, "Bad memory allocation\n");
     }
-    else
-        return temporary_polynomial;
 }
 
 void Polynomial::operator+=(const Polynomial &other)
 {
-    Polynomial temporary_polynomial;
-    Polynomial resulting_polynomial;
+    try{
+        Polynomial temporary_polynomial;
+        Polynomial resulting_polynomial;
 
-    temporary_polynomial.power = fmax(this->power, other.power);
-    temporary_variable = fmin(this->power, other.power);
-    temporary_polynomial.polynomial = new double[temporary_polynomial.power+1];
+        temporary_polynomial.power = fmax(this->power, other.power);
+        temporary_variable = fmin(this->power, other.power);
+        temporary_polynomial.polynomial = new double[temporary_polynomial.power+1];
 
-    for (i = 0; i <= temporary_variable; i++)
-        temporary_polynomial.polynomial[i] = this->polynomial[i] + other.polynomial[i];
+        for (i = 0; i <= temporary_variable; i++)
+            temporary_polynomial.polynomial[i] = this->polynomial[i] + other.polynomial[i];
 
-    if(this->power == temporary_polynomial.power)
-        for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
-            temporary_polynomial.polynomial[i] = this->polynomial[i];
-    else
-        for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
-            temporary_polynomial.polynomial[i] = other.polynomial[i];
+        if(this->power == temporary_polynomial.power)
+            for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
+                temporary_polynomial.polynomial[i] = this->polynomial[i];
+        else
+            for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
+                temporary_polynomial.polynomial[i] = other.polynomial[i];
 
-    if (fabs(temporary_polynomial.polynomial[temporary_polynomial.power]) < 1e-100)
-    {
-        i = temporary_polynomial.power;
-        while(fabs(temporary_polynomial.polynomial[i]) < 1e-100 && i != 0)
-            i--;
-        if (i != 0)
+        if (fabs(temporary_polynomial.polynomial[temporary_polynomial.power]) < 1e-100)
         {
-            resulting_polynomial.power = i;
-            resulting_polynomial.polynomial = new double[resulting_polynomial.power + 1];
-            for (i = 0; i <= resulting_polynomial.power; i++)
-                resulting_polynomial.polynomial[i] = temporary_polynomial.polynomial[i];
+            i = temporary_polynomial.power;
+            while(fabs(temporary_polynomial.polynomial[i]) < 1e-100 && i != 0)
+                i--;
+            if (i != 0)
+            {
+                resulting_polynomial.power = i;
+                resulting_polynomial.polynomial = new double[resulting_polynomial.power + 1];
+                for (i = 0; i <= resulting_polynomial.power; i++)
+                    resulting_polynomial.polynomial[i] = temporary_polynomial.polynomial[i];
+            }
+            *this = resulting_polynomial;
         }
-        *this = resulting_polynomial;
+        else
+            *this = temporary_polynomial;
+    } catch(MyException &message){
+        throw new MyException(EC_MEMORY, "Bad memory allocation\n");
     }
-    else
-        *this = temporary_polynomial;
 }
 
 Polynomial Polynomial::operator-(const Polynomial &other)
 {
-    Polynomial temporary_polynomial;
-    Polynomial resulting_polynomial;
+    try{
+        Polynomial temporary_polynomial;
+        Polynomial resulting_polynomial;
 
-    temporary_polynomial.power = fmax(this->power, other.power);
-    temporary_variable = fmin(this->power, other.power);
-    temporary_polynomial.polynomial = new double[temporary_polynomial.power+1];
+        temporary_polynomial.power = fmax(this->power, other.power);
+        temporary_variable = fmin(this->power, other.power);
+        temporary_polynomial.polynomial = new double[temporary_polynomial.power+1];
 
-    for (i = 0; i <= temporary_variable; i++)
-        temporary_polynomial.polynomial[i] = this->polynomial[i] - other.polynomial[i];
+        for (i = 0; i <= temporary_variable; i++)
+            temporary_polynomial.polynomial[i] = this->polynomial[i] - other.polynomial[i];
 
-    if(this->power == temporary_polynomial.power)
-        for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
-            temporary_polynomial.polynomial[i] = this->polynomial[i];
-    else
-        for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
-            temporary_polynomial.polynomial[i] = other.polynomial[i];
+        if(this->power == temporary_polynomial.power)
+            for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
+                temporary_polynomial.polynomial[i] = this->polynomial[i];
+        else
+            for (i = temporary_variable + 1; i <= temporary_polynomial.power; i++)
+                temporary_polynomial.polynomial[i] = other.polynomial[i];
 
-    if (fabs(temporary_polynomial.polynomial[temporary_polynomial.power]) < 1e-100)
-    {
-        i = temporary_polynomial.power;
-        while(fabs(temporary_polynomial.polynomial[i]) < 1e-100 && i != 0)
-            i--;
-        if (i != 0)
+        if (fabs(temporary_polynomial.polynomial[temporary_polynomial.power]) < 1e-100)
         {
-            resulting_polynomial.power = i;
-            resulting_polynomial.polynomial = new double[resulting_polynomial.power + 1];
-            for (i = 0; i <= resulting_polynomial.power; i++)
-                resulting_polynomial.polynomial[i] = temporary_polynomial.polynomial[i];
+            i = temporary_polynomial.power;
+            while(fabs(temporary_polynomial.polynomial[i]) < 1e-100 && i != 0)
+                i--;
+            if (i != 0)
+            {
+                resulting_polynomial.power = i;
+                resulting_polynomial.polynomial = new double[resulting_polynomial.power + 1];
+                for (i = 0; i <= resulting_polynomial.power; i++)
+                    resulting_polynomial.polynomial[i] = temporary_polynomial.polynomial[i];
+            }
+            return resulting_polynomial;
         }
-        return resulting_polynomial;
+        else
+            return temporary_polynomial;
+    } catch(MyException &message){
+        throw new MyException(EC_MEMORY, "Bad memory allocation\n");
     }
-    else
-        return temporary_polynomial;
 }
 
 void Polynomial::operator-=(const Polynomial &other)
@@ -305,19 +330,18 @@ size_t Polynomial::get_power()
     return power;
 }
 
-//печать
-void printPolynomial(Polynomial polynomial) 
+void Polynomial::printPolynomial() 
 {
-    for (i = 0; i <= polynomial.power; i++)
+    for (size_t i = 0; i <= this->power; i++)
     {
-        if (fabs(polynomial.polynomial[i]) > 1e-100 && i != polynomial.power && i != 0)
-            cout << polynomial.polynomial[i] << "x^" << i <<" + ";
-        if (fabs(polynomial.polynomial[i]) > 1e-100 && i == polynomial.power && i != 0)
-            cout << polynomial.polynomial[i] << "x^" << i;
-        if (fabs(polynomial.polynomial[i]) > 1e-100 && i != polynomial.power && i == 0)
-            cout << polynomial.polynomial[i] << " + ";
-        if (i == polynomial.power && i == 0)
-            cout << polynomial.polynomial[i];
+        if (fabs(this->polynomial[i]) > 1e-100 && i != this->power && i != 0)
+            cout << this->polynomial[i] << "x^" << i <<" + ";
+        if (fabs(this->polynomial[i]) > 1e-100 && i == this->power && i != 0)
+            cout << this->polynomial[i] << "x^" << i;
+        if (fabs(this->polynomial[i]) > 1e-100 && i != this->power && i == 0)
+            cout << this->polynomial[i] << " + ";
+        if (i == this->power && i == 0)
+            cout << this->polynomial[i];
     }
     cout << "\n";
 }

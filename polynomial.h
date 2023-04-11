@@ -1,4 +1,5 @@
 #include <iostream>
+
 class Polynomial
 {
 private:
@@ -28,5 +29,5 @@ public:
     bool operator!=(const Polynomial &other);
     size_t get_power();
 
-    friend void printPolynomial(Polynomial polynomial);
+    void printPolynomial();
 };
