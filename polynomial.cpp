@@ -227,14 +227,7 @@ Polynomial Polynomial::operator+(double constant)
 
 void Polynomial::operator+=(double constant)
 {
-    Polynomial resulting_polynomial;
-    resulting_polynomial.power = this->power;
-    resulting_polynomial.polynomial = new double[resulting_polynomial.power+1];
-    resulting_polynomial.polynomial[0] =  this->polynomial[0] + constant;
-    for(i = 1; i <= resulting_polynomial.power; i++)
-        resulting_polynomial.polynomial[i] = this->polynomial[i];
-    delete this->polynomial;
-    this->polynomial = resulting_polynomial.polynomial;
+    this->polynomial[0] += constant;
 }
 
 Polynomial Polynomial::operator-(double constant)
@@ -245,23 +238,18 @@ Polynomial Polynomial::operator-(double constant)
 
 void Polynomial::operator-=(double constant)
 {
-    Polynomial resulting_polynomial;
-    resulting_polynomial.power = this->power;
-    resulting_polynomial.polynomial = new double[resulting_polynomial.power+1];
-    resulting_polynomial.polynomial[0] =  this->polynomial[0] - constant;
-    for(i = 1; i <= resulting_polynomial.power; i++)
-        resulting_polynomial.polynomial[i] = this->polynomial[i];
-    delete this->polynomial;
-    this->polynomial = resulting_polynomial.polynomial;
+    this->polynomial[0] -= constant;
 }
 
 Polynomial Polynomial::operator*(double constant)
 {
+    Polynomial temporary_polynomial = *this;
+
     if (fabs(constant) > 1e-100)
     {
-        for(i = 0; i <= this->power; i++)
-            this->polynomial[i] *= constant;
-        return *this;
+        for(i = 0; i <= temporary_polynomial.power; i++)
+            temporary_polynomial.polynomial[i] *= constant;
+        return temporary_polynomial;
     }
     Polynomial zero_monomial;
     return zero_monomial;
@@ -269,30 +257,21 @@ Polynomial Polynomial::operator*(double constant)
 
 void Polynomial::operator*=(double constant)
 {
-    Polynomial resulting_polynomial;
     if (fabs(constant) > 1e-100)
-    {
-        resulting_polynomial.power = this->power;
-        resulting_polynomial.polynomial = new double[resulting_polynomial.power+1];
-        for(i = 0; i <= resulting_polynomial.power; i++)
-            resulting_polynomial.polynomial[i] = constant * this->polynomial[i];
-        delete this->polynomial;
-        this->polynomial = resulting_polynomial.polynomial;
-    }
+        for(i = 0; i <= this -> power; i++)
+            this -> polynomial[i] *= constant;
     else
     {
-        this->power = 0;
-        delete this->polynomial;
-        this->polynomial = resulting_polynomial.polynomial;
+        Polynomial zero_monomial;
+        *this = zero_monomial;
     }
-    
 }
 
 double Polynomial::operator()(double value_of_variable)
 {
     polynomial_value = this->polynomial[this->power];
-    for (i = (this->power-1); i > -1; i--)
-        polynomial_value = polynomial_value * value_of_variable + this->polynomial[i];
+    for (i = 0; i <= (this -> power) - 1; i++)
+        polynomial_value = polynomial_value * value_of_variable + this->polynomial[(this -> power) - 1 - i];
 
     return polynomial_value;
 }
@@ -301,7 +280,7 @@ bool Polynomial::operator==(const Polynomial &other)
 {
     if (this->power != other.power)
         return false;
-    for (i = 0; i<=power; i++)
+    for (i = 0; i <= power; i++)
     {
         if (this->polynomial[i] != other.polynomial[i])
             return false;
@@ -313,7 +292,7 @@ bool Polynomial::operator!=(const Polynomial &other)
 {
     if (this->power != other.power)
         return true;
-    for (i = 0; i<=power; i++)
+    for (i = 0; i <= power; i++)
     {
         if (this->polynomial[i] != other.polynomial[i])
             return true;
@@ -321,20 +300,24 @@ bool Polynomial::operator!=(const Polynomial &other)
     return false;      
 }
 
-//печать
-void Polynomial::Print() 
+size_t Polynomial::get_power()
 {
-    for (i = 0; i <= this->power; i++)
+    return power;
+}
+
+//печать
+void printPolynomial(Polynomial polynomial) 
+{
+    for (i = 0; i <= polynomial.power; i++)
     {
-        if (fabs(this->polynomial[i]) > 1e-100 && i != this->power && i != 0)
-            cout << this->polynomial[i] << "x^" << i <<" + ";
-        if (fabs(this->polynomial[i]) > 1e-100 && i == this->power && i != 0)
-            cout << this->polynomial[i] << "x^" << i;
-        if (fabs(this->polynomial[i]) > 1e-100&& i != this->power && i == 0)
-            cout << this->polynomial[i] << " + ";
-        if (i == this->power && i == 0)
-            cout << this->polynomial[i];
+        if (fabs(polynomial.polynomial[i]) > 1e-100 && i != polynomial.power && i != 0)
+            cout << polynomial.polynomial[i] << "x^" << i <<" + ";
+        if (fabs(polynomial.polynomial[i]) > 1e-100 && i == polynomial.power && i != 0)
+            cout << polynomial.polynomial[i] << "x^" << i;
+        if (fabs(polynomial.polynomial[i]) > 1e-100 && i != polynomial.power && i == 0)
+            cout << polynomial.polynomial[i] << " + ";
+        if (i == polynomial.power && i == 0)
+            cout << polynomial.polynomial[i];
     }
     cout << "\n";
-
 }

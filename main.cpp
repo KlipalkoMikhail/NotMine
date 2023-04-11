@@ -13,5 +13,6 @@ int main()
     a += b;
     a.Print();
     a = b*c;
+    a *= 5;
     a.Print();
 }
